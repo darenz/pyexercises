@@ -13,9 +13,9 @@ x = np.asarray(x0)
 y = np.asarray(y0)
 
 xTx = np.matmul(x.T,x)
-nomaltheta = np.matmul(np.matmul(xTx.I,x.T),y)
+nomaltheta = np.matmul(np.matmul(xTx,x),y)
 
-plt.scatter(x,y)
+plt.scatter((x,y))
 
 alpha = 0.001
 theta = np.zeros(len(data[0]))
