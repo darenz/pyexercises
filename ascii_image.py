@@ -1,54 +1,80 @@
 from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
+from PIL import ImageEnhance
 import argparse
 
 ascii_char = list("$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`o. ")
-ascii_char2 = list("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$???")
-
+ascii_char2 = list("$$$$$$$$$$$$$$RRRRRRRRRRRRRRRRRRR????????????????????^^^^^^^^^^^^^^^")
+ascii_char3 = list("♡♡♡♡♡♡♡♡♡♡♡♡♡♡ღღღღღღღღღღღღღღღღღღღღღღ❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣爱爱爱爱爱爱爱愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛❤❤❤❤❤❤❤❤❤❤❤❤❤♥♥♥♥♥♥♥♥❥❥❥❥❥❥❥❥❥❥❥❥❥❥❥❥❥❥")
+ascii_char4 = list("♡♡♡♡♡♡♡♡♡♡♡♡♡♡$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
 def getChar(r,g,b,alpha=256):
     if alpha==0:
         return ' '
     gray = int(0.2126 * r + 0.7152 * g + 0.0722 * b)
-    step = 256.0/len(ascii_char2)
-    return ascii_char2[int(gray/step)]
+    step = 256.0/len(ascii_char4)
+    return ascii_char4[int(gray/step)]
 
-parser = argparse.ArgumentParser()
+def getArgs():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file')
+    parser.add_argument('resize')
+    parser.add_argument('-o','--output')
+    #parser.add_argument('--width',type=int,default=80)
+    #parser.add_argument('--height',type=int,default=40)
+    args = parser.parse_args()
+    print(type(args))
+    return args
 
-parser.add_argument('file')
-parser.add_argument('-o','--output')
-parser.add_argument('-r','--resize')
-#parser.add_argument('--width',type=int,default=80)
-#parser.add_argument('--height',type=int,default=40)
+def getIMG(*args, **kwargs):
+    IMG = kwargs['file']
+    RESIZE = float(kwargs['resize'])
 
-args = parser.parse_args()
+    image = Image.open(IMG)
+    image = image.resize((int(image.size[0]*RESIZE),int(image.size[1]*RESIZE)))
+    # image.show()
+    size = image.size
+    # image.show()
+    # input()
+    return image,size
 
-IMG = args.file
-OUTPUT = args.output
-RESIZE = float(args.resize)
+def convertTXT(img):
+    HEIGHT = img.size[1]
+    WIDTH = img.size[0]
+    txt = ""
+    for i in range(HEIGHT):
+        for j in range(WIDTH):
+            txt += '  ' + getChar(*img.getpixel((j,i)))
+        txt += '\n'
+    return txt
 
-image = Image.open(IMG)
-(WIDTH,HEIGHT) = image.size
-#print(image.size)
-#print(WIDTH)
-#print(HEIGHT)
+def outputTXT(OUTPUT,txt):
+    if OUTPUT:
+        with open(OUTPUT,'w') as f:
+            f.write(txt)
+    else:
+        with open('output.txt','w') as f:
+            f.write(txt)
 
-if RESIZE:
-    HEIGHT = int(HEIGHT*RESIZE)
-    WIDTH = 5*int(WIDTH*RESIZE)
-    image = image.resize((WIDTH,HEIGHT),Image.NEAREST)
+if __name__ == "__main__":
+    args = getArgs();
+    img,size = getIMG(file=args.file,resize=args.resize)
 
-txt = ""
+    contr = ImageEnhance.Contrast(img)
+    CONTRAST_FACTOR = 5
+    img_con = contr.enhance(CONTRAST_FACTOR)
+    img_con.show()
+    # input()
 
-for i in range(HEIGHT):
-    for j in range(WIDTH):
-        txt += getChar(*image.getpixel((j,i)))
-    txt += '\n'
+    txt = convertTXT(img_con)
 
-print(txt)
+    new_size = (size[0]*20,size[1]*16)
+    new_image = Image.new("RGB",size=new_size)
 
-if OUTPUT:
-    with open(OUTPUT,'w') as f:
-        f.write(txt)
-else:
-    with open('output.txt','w') as f:
-        f.write(txt)
+    dr = ImageDraw.Draw(new_image)
+    font = ImageFont.truetype("Hack-Regular")
+    dr.text((0,0),txt)
+
+    new_image.show()
+    new_image.save('newpic.jpg')
