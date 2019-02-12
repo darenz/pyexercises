@@ -6,15 +6,13 @@ import argparse
 
 ascii_char = list("$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`o. ")
 ascii_char2 = list("$$$$$$$$$$$$$$RRRRRRRRRRRRRRRRRRR????????????????????^^^^^^^^^^^^^^^")
-ascii_char3 = list("♡♡♡♡♡♡♡♡♡♡♡♡♡♡ღღღღღღღღღღღღღღღღღღღღღღ❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣❣爱爱爱爱爱爱爱愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛愛❤❤❤❤❤❤❤❤❤❤❤❤❤♥♥♥♥♥♥♥♥❥❥❥❥❥❥❥❥❥❥❥❥❥❥❥❥❥❥")
-ascii_char4 = list("♡♡♡♡♡♡♡♡♡♡♡♡♡♡$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
 def getChar(r,g,b,alpha=256):
     if alpha==0:
         return ' '
     gray = int(0.2126 * r + 0.7152 * g + 0.0722 * b)
-    step = 256.0/len(ascii_char4)
-    return ascii_char4[int(gray/step)]
+    step = 256.0/len(ascii_char2)
+    return ascii_char2[int(gray/step)]
 
 def getArgs():
     parser = argparse.ArgumentParser()
@@ -24,7 +22,7 @@ def getArgs():
     #parser.add_argument('--width',type=int,default=80)
     #parser.add_argument('--height',type=int,default=40)
     args = parser.parse_args()
-    print(type(args))
+    # print(type(args))
     return args
 
 def getIMG(*args, **kwargs):
@@ -73,8 +71,9 @@ if __name__ == "__main__":
     new_image = Image.new("RGB",size=new_size)
 
     dr = ImageDraw.Draw(new_image)
-    font = ImageFont.truetype("Hack-Regular")
-    dr.text((0,0),txt)
+    # font = ImageFont.truetype("S2Glove.ttf")
+    font = ImageFont.load_default()
+    dr.text((0,0),txt,font=font)
 
     new_image.show()
     new_image.save('newpic.jpg')
